@@ -1,7 +1,9 @@
 import os
 import re
+import traceback
 
 from PIL import Image
+from nonebot import logger
 from nonebot.adapters.onebot.v11 import MessageSegment, GroupMessageEvent, PrivateMessageEvent, Bot
 from nonebot.typing import T_State
 from .qweather import *
@@ -178,7 +180,8 @@ async def sendRealTimeWeather(bot: Bot, event: GroupMessageEvent | PrivateMessag
 
                     # 天气 状态文本 和 图片 和 温度 和 建议
                     download = True
-                    if not os.path.exists(os.path.join(ExConfig.cache_path, "textures/weather/icons/%s.png" % icon)):
+                    if not os.path.exists(os.path.join(ExConfig.cache_path, "textures/weather/icons/%s.png" % icon)) and \
+                            not os.path.exists(os.path.join(ExConfig.res_path, "textures/weather/icons/%s.png" % icon)):
                         download = await ExtraData.download_file("https://a.hecdn.net/img/common/icon/202106d/%s.png" % icon,
                                                                  os.path.join(ExConfig.cache_path,
                                                                               "textures/weather/icons/%s.png" % icon))
@@ -189,10 +192,20 @@ async def sendRealTimeWeather(bot: Bot, event: GroupMessageEvent | PrivateMessag
                                                     img=Image.open(os.path.join(ExConfig.cache_path,
                                                                                 "textures/weather/icons/%s.png" % icon)))
                     except BaseException:
-                        await weather_card.addImage(uvSize=(1, 1), boxSize=(0.275, 0.275), xyOffset=(0, 0),
-                                                    baseAnchor=(0.5, 0.27 - main_text_offset), imgAnchor=(1, 0.5),
-                                                    img=Image.open(os.path.join(ExConfig.res_path,
-                                                                                "textures/weather/icons/default.png")))
+                        try:
+                            print("尝试失败")
+                            logger.info("尝试失败")
+                            await weather_card.addImage(uvSize=(1, 1), boxSize=(0.275, 0.275), xyOffset=(0, 0),
+                                                        baseAnchor=(0.5, 0.27 - main_text_offset), imgAnchor=(1, 0.5),
+                                                        img=Image.open(os.path.join(ExConfig.res_path,
+                                                                                    "textures/weather/icons/%s.png" % icon)))
+                        except BaseException as e:
+                            traceback.print_exc()
+
+                            await weather_card.addImage(uvSize=(1, 1), boxSize=(0.275, 0.275), xyOffset=(0, 0),
+                                                        baseAnchor=(0.5, 0.27 - main_text_offset), imgAnchor=(1, 0.5),
+                                                        img=Image.open(os.path.join(ExConfig.res_path,
+                                                                                    "textures/weather/icons/default.png")))
 
                     # 天气文本
                     await weather_card.addText(uvSize=(1, 1), boxSize=(0.4, 0.075), xyOffset=(0, 0),

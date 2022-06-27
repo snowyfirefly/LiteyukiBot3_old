@@ -68,7 +68,7 @@ async def listenerHandle(bot: Bot, event: Union[GroupMessageEvent, PrivateMessag
         # 基于好感度的回复
         favo_reply_probability = (Balance.clamp(await Balance.getFavoValue(event.user_id) / 200, 0, 1))
         reply = await get_ai_reply(bot, event, state)
-    if reply is not None and random.random() <= session_reply_probability:
+    if reply is not None and random.random() <= session_reply_probability or await to_me()(bot, event, state):
         user_call_bot = await ExtraData.get_user_data(user_id=event.user_id, key="my.user_call_bot", default=list(bot.config.nickname)[0])
         placeholder = {
             "%msg%": Command.escape(event.raw_message),

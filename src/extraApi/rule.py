@@ -23,7 +23,8 @@ def check_plugin_enable(pluginId: str, force_session_enable: bool = True):
         enabledPlugin = await ExtraData.getData(targetType=event.message_type, targetId=ExtraData.getTargetId(event),
                                                 key="enabled_plugin", default=list())
         # 群聊授权或私聊授权
-        if await ExtraData.getData(targetType=event.message_type, targetId=ExtraData.getTargetId(event), key="enable", default=False):
+        if await ExtraData.getData(targetType=event.message_type, targetId=ExtraData.getTargetId(event), key="enable", default=False) or not \
+                await ExtraData.get_global_data(key="kami.base.verify", default=False):
             pass
         else:
             if force_session_enable:

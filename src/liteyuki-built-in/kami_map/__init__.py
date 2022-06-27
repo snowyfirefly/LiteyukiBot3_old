@@ -1,3 +1,4 @@
+from nonebot import logger
 from nonebot.adapters.onebot.v11 import Message
 from nonebot.params import CommandArg
 from ...extraApi.base import Balance
@@ -6,11 +7,43 @@ from nonebot.rule import startswith
 from .api import *
 from .userData import *
 
-pois_cmd = on_command(cmd="pois", aliases={"查询地点"},
+pois_cmd = on_command(cmd="pois", aliases={"查询地点", "地点查询"},
                       rule=minimumCoin(2, "无法查询地点", startswith(("查询地点", "pois"))),
                       priority=12, block=True)
+district_query = on_command(cmd="查询行政区", aliases={"行政区查询"}, block=True)
 
 locate_ip = on_command(cmd="ip定位", aliases={"IP定位", "Ip定位", "iP定位"}, priority=12, block=True)
+
+
+@district_query.handle()
+async def _(bot: Bot, event: Union[GroupMessageEvent, PrivateMessageEvent], args: Message = CommandArg()):
+    args, params = Command.formatToCommand(str(args))
+    keywords = Command.formatToString(*args)
+    params["keywords"] = keywords
+    if "page_size" not in params:
+        params["page_size"] = 1
+    districts = await get_district(keywords, params)
+
+    if districts.get("info") == "OK":
+        dis_list = districts.get("districts")
+        custom_dis = {
+            "500100": "重庆市区部"
+        }
+        if len(dis_list) > 0:
+            dis = dis_list[0]
+            dis["name"] = custom_dis.get(dis.get("adcode"), dis.get("name"))
+            reply = "%s(%s)\n下级行政区:\n" % (dis.get("name"), dis.get("adcode"))
+            if dis.get("adcode") in ["500000", "110000", "120000", "310000"]:
+                dis = (await get_district(keywords, {"subdistrict": "2"})).get("districts")[0]
+
+                new_dis = []
+                for dis_coty in dis.get("districts"):
+                    new_dis += dis_coty.get("districts")
+                dis["districts"] = new_dis
+
+            for sub_dis in dis.get("districts"):
+                reply += "\n- %s" % sub_dis.get("name")
+            await district_query.send(reply)
 
 
 @pois_cmd.handle()
@@ -36,7 +69,7 @@ async def pois_handle(bot: Bot, event: Union[PrivateMessageEvent, GroupMessageEv
 
 
 @pois_cmd.got(key="city")
-async def pois_got_city(bot: Bot, event: Union[PrivateMessageEvent, GroupMessageEvent], state: T_State, args: Message = CommandArg()):
+async def pois_got_city(bot: Bot, event: Union[PrivateMessageEvent, GroupMessageEvent], state: T_State):
     if state["city"] is not True:
         state["params"]["region"] = str(state["city"])
         pois = await get_poi(params=state["params"])

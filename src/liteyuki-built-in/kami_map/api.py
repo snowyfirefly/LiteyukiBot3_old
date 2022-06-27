@@ -1,8 +1,17 @@
-
 import requests
 import aiohttp
 
 from ...extraApi.base import Command, ExtraData
+
+
+async def get_district(keywords: str = None, params: dict = None) -> dict:
+    if params is None:
+        params = {}
+    if keywords is not None:
+        params["keywords"] = keywords
+    params["key"] = await ExtraData.get_global_data(key="kami.map.key", default="")
+    async with aiohttp.request("GET", url="https://restapi.amap.com/v3/config/district?", params=params) as r:
+        return await r.json()
 
 
 async def get_poi(keywords: str = None, params: dict = None) -> dict:
@@ -17,7 +26,7 @@ async def get_poi(keywords: str = None, params: dict = None) -> dict:
         params = {}
     if keywords is not None:
         params["keywords"] = keywords
-    params["key"] = await ExtraData.getData(targetType=ExtraData.Group, targetId=0, key="kami.map.key", default="")
+    params["key"] = await ExtraData.get_global_data(key="kami.map.key", default="")
     async with aiohttp.request("GET", url="https://restapi.amap.com/v5/place/text?", params=params) as r:
         return await r.json()
 
