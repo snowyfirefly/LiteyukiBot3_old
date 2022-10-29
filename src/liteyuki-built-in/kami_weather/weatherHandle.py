@@ -137,8 +137,8 @@ async def sendRealTimeWeather(bot: Bot, event: GroupMessageEvent | PrivateMessag
                         city_description = await Command.translate(text=city_description, from_lang="zh", to_lang=state["params"].get("lang", "zh"))
 
                 try:
-                    font_80 = os.path.join(ExConfig.res_path, state["params"].get("font1", "fonts/MiSans-Heavy.ttf"))
-                    font_60 = os.path.join(ExConfig.res_path, state["params"].get("font2", "fonts/MiSans-Semibold.ttf"))
+                    font_80 = os.path.join(ExConfig.res_path, state["params"].get("font1", "fonts/hywh.ttf"))
+                    font_60 = os.path.join(ExConfig.res_path, state["params"].get("font2", "fonts/hywh.ttf"))
 
                     base_img = Image.open(os.path.join(ExConfig.res_path, "textures/weather/mesh_4xx_b.png"))
                     weather_card: Cardimage = Cardimage(baseImg=base_img)
@@ -229,7 +229,7 @@ async def sendRealTimeWeather(bot: Bot, event: GroupMessageEvent | PrivateMessag
                     wind_icon_pos = await weather_card.addImage(uvSize=(1, 1), boxSize=(0.07, 0.07), xyOffset=(0, 0),
                                                                 baseAnchor=(0.06, sub_text_center_line), imgAnchor=(0.5, 0.5),
                                                                 img=Image.open(os.path.join(ExConfig.res_path,
-                                                                                            "textures/weather/风速.png")))
+                                                                                            "textures/genshin/anemo.png")))
                     await weather_card.addText(uvSize=(1, 1), boxSize=(0.4, lite_font_size), xyOffset=(0, 0),
                                                baseAnchor=(wind_icon_pos[2] + 0.01, sub_text_center_line), textAnchor=(0, 1),
                                                content="%s %s°" % (windDir, wind360),
@@ -243,7 +243,7 @@ async def sendRealTimeWeather(bot: Bot, event: GroupMessageEvent | PrivateMessag
                     feel_icon_pos = await weather_card.addImage(uvSize=(1, 1), boxSize=(0.08, 0.08), xyOffset=(0, 0),
                                                                 baseAnchor=(0.34, sub_text_center_line), imgAnchor=(0.5, 0.5),
                                                                 img=Image.open(os.path.join(ExConfig.res_path,
-                                                                                            "textures/weather/衣服.png")))
+                                                                                            "textures/genshin/pyro.png")))
                     await weather_card.addText(uvSize=(1, 1), boxSize=(0.4, lite_font_size), xyOffset=(0, 0),
                                                baseAnchor=(feel_icon_pos[2] + 0.01, sub_text_center_line), textAnchor=(0, 1),
                                                content="%s%s" % (feelsLike, tempUnit),
@@ -257,7 +257,7 @@ async def sendRealTimeWeather(bot: Bot, event: GroupMessageEvent | PrivateMessag
                     rain_icon_pos = await weather_card.addImage(uvSize=(1, 1), boxSize=(0.08, 0.08), xyOffset=(0, 0),
                                                                 baseAnchor=(0.58, sub_text_center_line), imgAnchor=(0.5, 0.5),
                                                                 img=Image.open(os.path.join(ExConfig.res_path,
-                                                                                            "textures/weather/w_湿度.png")))
+                                                                                            "textures/genshin/hydro.png")))
                     await weather_card.addText(uvSize=(1, 1), boxSize=(0.4, lite_font_size), xyOffset=(0, 0),
                                                baseAnchor=(rain_icon_pos[2] + 0.008, sub_text_center_line), textAnchor=(0, 1),
                                                content="%smm" % precip,
@@ -270,7 +270,7 @@ async def sendRealTimeWeather(bot: Bot, event: GroupMessageEvent | PrivateMessag
                     # 太阳升起和落下
                     try:
                         sun_pos = await weather_card.addImage(uvSize=(1, 1), boxSize=(0.08, 0.08), xyOffset=(0, 0), baseAnchor=(0.82, sub_text_center_line), imgAnchor=(0.5, 0.5),
-                                                              img=Image.open(os.path.join(ExConfig.res_path, "textures/weather/日出日落.png")))
+                                                              img=Image.open(os.path.join(ExConfig.res_path, "textures/genshin/sands.png")))
                         daily_weather_data = await CityWeatherApi.get_daily_weather(location="%s,%s" % (lon, lat), key=apikey, key_type=api_key_type, days=1,
                                                                                     lang=state["params"].get("lang", "zh"), unit=state["params"].get("unit", "m"))
                         await weather_card.addText(uvSize=(1, 1), boxSize=(0.4, lite_font_size), xyOffset=(0, 0),

@@ -41,7 +41,7 @@ async def _(bot: Bot, event: Union[GroupMessageEvent, PrivateMessageEvent]):
             await set_ai_reply.send(message="当前会话智能回复已启用，无需重复操作")
         else:
             await set_ai_reply.send(message="当前会话智能回复启用成功")
-            await ExtraData.setData(targetType=event.message_type, targetId=ExtraData.getTargetId(event), key="kami.auto_reply.enable_ai", value=False)
+            await ExtraData.setData(targetType=event.message_type, targetId=ExtraData.getTargetId(event), key="kami.auto_reply.enable_ai", value=True)
     else:
         if not state_0:
             await set_ai_reply.send(message="当前会话智能回复已停用，无需重复操作")
@@ -63,12 +63,12 @@ async def listenerHandle(bot: Bot, event: Union[GroupMessageEvent, PrivateMessag
                                                         default=1.0)
     session_enable_ai = await ExtraData.getData(targetType=event.message_type, targetId=ExtraData.getTargetId(event), key="kami.auto_reply.enable_ai",
                                                 default=True if isinstance(event, PrivateMessageEvent) else False)
-
+    print(session_enable_ai, session_reply_probability)
     if session_enable_ai and reply is None:
         # 基于好感度的回复
         favo_reply_probability = (Balance.clamp(await Balance.getFavoValue(event.user_id) / 200, 0, 1))
         reply = await get_ai_reply(bot, event, state)
-    if reply is not None and random.random() <= session_reply_probability or await to_me()(bot, event, state):
+    if reply is not None and (random.random() <= session_reply_probability or await to_me()(bot, event, state)):
         user_call_bot = await ExtraData.get_user_data(user_id=event.user_id, key="my.user_call_bot", default=list(bot.config.nickname)[0])
         placeholder = {
             "%msg%": Command.escape(event.raw_message),
