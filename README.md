@@ -4,6 +4,7 @@
 
 # Liteyuki Bot
 
+### !!!!本项目不再更新，要使用最新版本轻雪请转移至[LiteyukiBot](https://gitee.com/snowykami/liteyuki-bot)
 
 ### 轻雪机器人
 
